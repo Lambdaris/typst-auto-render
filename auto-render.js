@@ -3,20 +3,21 @@ import wypst from 'wypst';
 
 const findMathTextRange = function (string) {
     let base = 0;
+    let mathTextRange = [];
     while (base < string.length) {
-        let begin = string.indexOf("$", base);
-        if (begin === -1) {
+        let idx = string.indexOf("$", base);
+        if (idx === -1) {
             break;
-        } else if (begin > 0 && string[begin - 1] === "\\") {
-            base = begin + 1;
+        } else if (idx > 0 && string[idx - 1] === "\\") {
+            base = idx + 1;
             continue;
         } else {
-            let end = string.indexOf("$", begin + 1);
-            if (end === -1) {
-                break;
-            } else {
-                return [begin, end + 1]
+            mathTextRange.push(idx);
+            if (mathTextRange.length === 2) {
+                mathTextRange[1] += 1;
+                return mathTextRange;
             }
+            base = idx + 1;
         }
     }
     return [-1, 0]
@@ -33,10 +34,12 @@ const extractMathText = function (string) {
             });
             break;
         } else {
-            data.push({
-                type: "text",
-                data: string.slice(0, begin),
-            });
+            if (begin > 0) {
+                data.push({
+                    type: "text",
+                    data: string.slice(0, begin),
+                });
+            }
             let rawData = string.slice(begin, end);
             let display = rawData.at(1) === " " && rawData.at(-2) === " ";
             data.push({
@@ -155,9 +158,7 @@ const renderMathInElement = function (elem, options) {
 
 window.renderMathInElement = function (elem, options) {
     wypst.init().then(() => {
-        renderMathInElement(document.body, {
-            throwOnError: false
-        });
+        renderMathInElement(elem, options);
     });
 }
 
