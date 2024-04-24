@@ -41,7 +41,7 @@ const extractMathText = function (string) {
                 });
             }
             let rawData = string.slice(begin, end);
-            let display = rawData.at(1) === " " && rawData.at(-2) === " ";
+            let display = rawData.slice(1, 2) === " " && rawData.slice(-2, -1) === " ";
             data.push({
                 type: "math",
                 data: rawData.slice(1, -1).trim(),
